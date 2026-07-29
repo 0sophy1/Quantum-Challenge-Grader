@@ -9,11 +9,13 @@
 # that they have been altered from the originals.
 
 import pytest
+from unittest.mock import patch
 
 from qc_grader.grader.grade import (
     ProgressResponse,
     determine_grade_response,
     determine_progress_response,
+    grade_answer,
 )
 
 
@@ -36,13 +38,13 @@ from qc_grader.grader.grade import (
             False,
             0,
             "Circuit A: you said 2, but depth is 3.",
-            "\nOops 😕! Circuit A: you said 2, but depth is 3.\nPlease review your answer and try again.",
+            "\nNot quite! Circuit A: you said 2, but depth is 3.\nPlease review your answer and try again.",
         ),
         (
             False,
             1,
             "Incorrect basis operations.",
-            "\nOops 😕! Incorrect basis operations.\nYou scored 1 on this exercise.\nPlease review your answer and try again.",
+            "\nNot quite! Incorrect basis operations.\nYou scored 1 on this exercise.\nPlease review your answer and try again.",
         ),
     ],
 )
@@ -183,3 +185,11 @@ def test_determine_progress_response(
 def test_determine_progress_response_unknown_lab() -> None:
     with pytest.raises(ValueError, match='No lab named "lab_missing" found.'):
         determine_progress_response(_MULTI_LAB_RESPONSE, lab_name="lab_missing")
+
+
+def test_grade_answer_too_large(capsys: pytest.CaptureFixture) -> None:
+    with patch("qc_grader.grader.grade._MAX_ANSWER_BYTES", 10):
+        grade_answer("this answer is definitely over 10 bytes", "lab1", "ex1", "ch1")
+    out = capsys.readouterr().out
+    assert "too large to submit" in out
+    assert "MB" in out

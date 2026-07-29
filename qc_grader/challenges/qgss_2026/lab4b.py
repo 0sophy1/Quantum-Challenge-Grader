@@ -490,6 +490,15 @@ def grade_lab4b_ex4(
 
 
 def _extract_qpu_usage_seconds(job: RuntimeJobV2):
+    usage_fn = getattr(job, "usage", None)
+    if callable(usage_fn):
+        try:
+            value = usage_fn()
+            if value is not None:
+                return float(value)
+        except Exception:
+            pass
+
     metrics = getattr(job, "metrics", None)
     if callable(metrics):
         try:
@@ -504,12 +513,14 @@ def _extract_qpu_usage_seconds(job: RuntimeJobV2):
     if not isinstance(usage, dict):
         return None
 
-    value = usage.get("quantum_seconds")
-
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return None
+    for key in ("quantum_seconds", "seconds"):
+        value = usage.get(key)
+        if value is not None:
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                continue
+    return None
 
 
 @typechecked
@@ -537,7 +548,8 @@ def grade_lab4b_exbonus(
         raise ValueError(
             "result_bonus['exp_map'] does not match the expectation map reconstructed from its estimator job"
         )
-
+    if len(numbers_bonus) != 1600:
+        raise ValueError("The length of numbers_bonus should be 1600")
     # Convert refined bit assignment back to number sets
     set0 = [
         int(numbers_bonus[i]) for i in range(len(numbers_bonus)) if best_bits[i] == 1
