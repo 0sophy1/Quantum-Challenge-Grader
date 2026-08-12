@@ -30,7 +30,7 @@ def _grade(answer: Any, exercise: str) -> None:
 
 
 @typechecked
-def grade_magnetization_ex1(
+def grade_ex1(
     boxed_circuit: QuantumCircuit,
     unique_2q_instructions: list[CircuitInstruction],
     noise_model_paulis: dict[str, PauliLindbladMap],
@@ -57,7 +57,7 @@ def grade_magnetization_ex1(
 
 
 @typechecked
-def grade_magnetization_ex2(
+def grade_ex2(
     local_scales_per_site: list,
     gamma_per_site: list[float] | np.ndarray,
     num_qubits: int,
@@ -77,7 +77,7 @@ def grade_magnetization_ex2(
 
 
 @typechecked
-def grade_magnetization_ex3(
+def grade_ex3(
     program: QuantumProgram,
     num_qubits: int,
     num_randomizations: int,
@@ -97,7 +97,7 @@ def grade_magnetization_ex3(
 
 
 @typechecked
-def grade_magnetization_ex4(
+def grade_ex4(
     magnetization: np.ndarray | list[float],
     magnetization_raw: np.ndarray | list[float],
     magnetization_exact: np.ndarray | list[float],
