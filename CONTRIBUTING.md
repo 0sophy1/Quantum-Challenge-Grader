@@ -87,11 +87,30 @@ maintain older versions in parallel.
 
 Use this workflow to test the Python client against the Grader server.
 
+### Environment variables
+
+The client chooses which server (and IAM endpoint) to talk to based on
+environment variables. With none set, it uses the **production** grader server
+and your default saved account.
+
+| Variable | Effect |
+| --- | --- |
+| _(none)_ | Production grader server (`https://qac-grading.quantum.ibm.com`). |
+| `STAGING=1` | Staging grader server (`https://qac-grading-dev.quantum.ibm.com`). Auth prefers the `grader-staging` saved account. |
+| `DEV=1` | Local development server (`http://127.0.0.1:5000`). Auth prefers the `grader-staging` saved account. |
+| `QC_API_KEY` | Use this API key directly; it takes precedence over any saved account, in every mode. |
+
+Set them when launching the REPL — e.g. `STAGING=1 uv run python` (see
+[Manually testing your changes](#manually-testing-your-changes-before-opening-a-pr)).
+
 ### Initial setup
 
 You must create a Quantum API token for an account with at least one instance.
+Set up the prod account below. The staging/local account is only needed if you
+test the client against the staging or local development server (`STAGING=1` or
+`DEV=1`) — skip it otherwise.
 
-Prod server:
+**Prod server** (default):
 
 1. Use https://quantum.cloud.ibm.com to create the API key
 2. Save the key by running `uv run python`, then this code:
@@ -106,7 +125,7 @@ QiskitRuntimeService.save_account(
 ```
 3. Close the REPL.
 
-Staging or local development server:
+**Staging or local development server** (only if you use `STAGING=1` or `DEV=1`):
 
 1. Use https://quantum.test.cloud.ibm.com to create the API key.
 2. Save the key by running `uv run python`, then this code:
@@ -122,7 +141,13 @@ QiskitRuntimeService.save_account(
 ```
 3. Close the REPL.
 
-### How to run
+### Manually testing your changes (before opening a PR)
+
+This is a development phase check, not how the grader is normally used. End users
+`pip install qc-grader` and call the grading functions from their challenge
+notebooks; challenge owners just merge their labs and the published package is
+used as-is. Before opening a PR, you can exercise your grading functions against
+a running server from a REPL:
 
 1. Launch a Python REPL:
   - Prod server: `uv run python`
@@ -131,7 +156,7 @@ QiskitRuntimeService.save_account(
 2. In the REPL, import and run your exercises. For example:
 
 ```python
->>> from qc_grader.challenges.qgss_2026 import grade_lab0_ex1
+>>> from qc_grader.challenges.challenge import grade_lab0_ex1
 >>> grade_lab0_ex1()
 ```
 
@@ -144,7 +169,7 @@ Create a new folder under `qc_grader/challenges` with the name of the challenge.
 * A file for each lab (such as `lab0.py`, `lab2.py`)
 * An `__init__.py`, which imports and re-exports the grading functions from your labs.
 
-  Every challenge must also export a `check_progress` function so users can see how far they've gotten:
+  Every challenge must also export a `check_progress` function so users can see how far they've gotten. Add this to the same `__init__.py`:
 
   ```python
   from qc_grader.grader.grade import create_check_progress_function
@@ -153,9 +178,9 @@ Create a new folder under `qc_grader/challenges` with the name of the challenge.
   check_progress = create_check_progress_function("...")
   ```
 
-  Users call `check_progress()` (no arguments) to print a per-lab and per-exercise breakdown of their submissions plus a challenge-wide aggregate.
+  `create_check_progress_function` is a factory: it takes your challenge name and returns a ready-made `check_progress` function with that name baked in, so you don't have to write it out yourself. It runs once, at import time, and makes no network call — the request to the server only happens later, when a user actually calls `check_progress()`. That call prints a challenge-wide aggregate plus a per-lab and per-exercise breakdown of their submissions; they can also pass a lab name — `check_progress("lab1")` — to see just that lab.
 
-  If your challenge is a team challenge, you should also export a `join_team` function so users can register with a team when they start.
+  Only if your challenge is run as a team challenge, also export a `join_team` function in the same `__init__.py` (skip this entirely for individual challenges):
 
   ```python
   from qc_grader.grader.grade import create_join_team_function
@@ -164,7 +189,7 @@ Create a new folder under `qc_grader/challenges` with the name of the challenge.
   join_team = create_join_team_function("...")
   ```
 
-  Users must call `join_team()` with their team name to participate in a team challenge. They can switch teams any time.
+  `create_join_team_function` works the same way — it binds your challenge name and returns a `join_team` function. When a participant calls `join_team("<team name>")`, their submissions are associated with that team; they can switch teams at any time.
 
 You may find it easier to copy an existing challenge and modify it.
 
@@ -172,21 +197,21 @@ You may find it easier to copy an existing challenge and modify it.
 
 A *lab* is a single Python file corresponding to a Jupyter notebook that users receive. Each *challenge* has one or more labs. When you add new exercises to the server, add a matching Python file here so that users can call grading functions from their Jupyter notebooks.
 
-Create `qc_grader/challenges/{challenge}/{lab}.py`, e.g. `qc_grader/challenges/qgss_2027/lab1.py`.
+Create `qc_grader/challenges/{challenge}/{lab}.py`, e.g. `qc_grader/challenges/challenge/lab1.py`.
 
-The `_CHALLENGE` and `_LAB` constants, and each exercise string (e.g., `"ex1"`), must exactly match the identifiers configured on the server. These are permanent: once a challenge is live, changing them breaks existing notebook submissions.
+The `_CHALLENGE` and `_LAB` constants, and each exercise string (e.g., `"ex1"`), must exactly match the identifiers configured on the server. These are permanent: once a challenge is live, changing them breaks existing notebook submissions. (The challenge, lab, and exercise identifiers, and the actual grading, are configured server-side by the IBM Quantum team; the client only forwards answers to them.)
 
 A minimal lab file:
 
 ```python
-# qc_grader/challenges/qgss_2027/lab1.py
+# qc_grader/challenges/challenge/lab1.py
 from typing import Any
 
 from typeguard import typechecked
 
 from qc_grader.grader.grade import grade_answer
 
-_CHALLENGE = "qgss_2027"
+_CHALLENGE = "challenge"
 _LAB = "lab1"
 
 
@@ -207,7 +232,7 @@ def grade_lab1_ex2(answer: int) -> None:
 Then, export every grading function from the challenge package's `__init__.py`:
 
 ```python
-# qc_grader/challenges/qgss_2027/__init__.py
+# qc_grader/challenges/challenge/__init__.py
 from .lab1 import grade_lab1_ex1, grade_lab1_ex2
 
 __all__ = ["grade_lab1_ex1", "grade_lab1_ex2"]
@@ -216,7 +241,7 @@ __all__ = ["grade_lab1_ex1", "grade_lab1_ex2"]
 Users can then import your functions like this:
 
 ```python
-from qc_grader.challenges.qgss_2027 import grade_lab1_ex1
+from qc_grader.challenges.challenge import grade_lab1_ex1
 ```
 
 ### Type validation
