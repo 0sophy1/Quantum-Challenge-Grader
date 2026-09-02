@@ -175,10 +175,10 @@ from .noise_buster import (
 )
 
 from .magnetization import (
-    grade_ex1 as grade_magnetization_ex1,
-    grade_ex2 as grade_magnetization_ex2,
-    grade_ex3 as grade_magnetization_ex3,
-    grade_ex4 as grade_magnetization_ex4,
+    grade_magnetization_ex1,
+    grade_magnetization_ex2,
+    grade_magnetization_ex3,
+    grade_magnetization_ex4,
 )
 
 _CHALLENGE = "fallfest_2026"
