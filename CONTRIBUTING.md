@@ -178,7 +178,7 @@ Create a new folder under `qc_grader/challenges` with the name of the challenge.
   check_progress = create_check_progress_function("...")
   ```
 
-  `create_check_progress_function` is a factory: it takes your challenge name and returns a ready-made `check_progress` function with that name baked in, so you don't have to write it out yourself. It runs once, at import time, and makes no network call — the request to the server only happens later, when a user actually calls `check_progress()`. That call prints a challenge-wide aggregate plus a per-lab and per-exercise breakdown of their submissions; they can also pass a lab name — `check_progress("lab1")` — to see just that lab.
+  `create_check_progress_function` is a factory: it takes your challenge name and returns a ready-made `check_progress` function with that name baked in, so that users don't have to write it out themselves. The `check_progress()` call prints a challenge-wide aggregate, plus a per-lab and per-exercise breakdown of their submissions; users can also pass a lab name — `check_progress("lab1")` — to see just that lab.
 
   Only if your challenge is run as a team challenge, also export a `join_team` function in the same `__init__.py` (skip this entirely for individual challenges):
 
