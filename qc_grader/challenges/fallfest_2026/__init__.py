@@ -170,6 +170,17 @@ from .grovers import (
     grade_grovers_ex8,
 )
 
+from .noise_buster import (
+    check_result as check_noise_buster_result,
+)
+
+from .magnetization import (
+    grade_magnetization_ex1,
+    grade_magnetization_ex2,
+    grade_magnetization_ex3,
+    grade_magnetization_ex4,
+)
+
 _CHALLENGE = "fallfest_2026"
 check_progress = create_check_progress_function(_CHALLENGE)
 __all__ = [
@@ -304,4 +315,9 @@ __all__ = [
     "grade_grovers_ex6",
     "grade_grovers_ex7",
     "grade_grovers_ex8",
+    "check_noise_buster_result",
+    "grade_magnetization_ex1",
+    "grade_magnetization_ex2",
+    "grade_magnetization_ex3",
+    "grade_magnetization_ex4",
 ]
