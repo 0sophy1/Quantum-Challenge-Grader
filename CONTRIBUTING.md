@@ -156,7 +156,7 @@ a running server from a REPL:
 2. In the REPL, import and run your exercises. For example:
 
 ```python
->>> from qc_grader.challenges.challenge import grade_lab0_ex1
+>>> from qc_grader.challenges.my_challenge import grade_lab0_ex1
 >>> grade_lab0_ex1()
 ```
 
@@ -197,21 +197,21 @@ You may find it easier to copy an existing challenge and modify it.
 
 A *lab* is a single Python file corresponding to a Jupyter notebook that users receive. Each *challenge* has one or more labs. When you add new exercises to the server, add a matching Python file here so that users can call grading functions from their Jupyter notebooks.
 
-Create `qc_grader/challenges/{challenge}/{lab}.py`, e.g. `qc_grader/challenges/challenge/lab1.py`.
+Create `qc_grader/challenges/{my_challenge}/{lab}.py`, e.g. `qc_grader/challenges/my_challenge/lab1.py`.
 
 The `_CHALLENGE` and `_LAB` constants, and each exercise string (e.g., `"ex1"`), must exactly match the identifiers configured on the server. These are permanent: once a challenge is live, changing them breaks existing notebook submissions. (The challenge, lab, and exercise identifiers, and the actual grading, are configured server-side by the IBM Quantum team; the client only forwards answers to them.)
 
 A minimal lab file:
 
 ```python
-# qc_grader/challenges/challenge/lab1.py
+# qc_grader/challenges/my_challenge/lab1.py
 from typing import Any
 
 from typeguard import typechecked
 
 from qc_grader.grader.grade import grade_answer
 
-_CHALLENGE = "challenge"
+_CHALLENGE = "my_challenge"
 _LAB = "lab1"
 
 
@@ -232,7 +232,7 @@ def grade_lab1_ex2(answer: int) -> None:
 Then, export every grading function from the challenge package's `__init__.py`:
 
 ```python
-# qc_grader/challenges/challenge/__init__.py
+# qc_grader/challenges/my_challenge/__init__.py
 from .lab1 import grade_lab1_ex1, grade_lab1_ex2
 
 __all__ = ["grade_lab1_ex1", "grade_lab1_ex2"]
@@ -241,7 +241,7 @@ __all__ = ["grade_lab1_ex1", "grade_lab1_ex2"]
 Users can then import your functions like this:
 
 ```python
-from qc_grader.challenges.challenge import grade_lab1_ex1
+from qc_grader.challenges.my_challenge import grade_lab1_ex1
 ```
 
 ### Type validation
