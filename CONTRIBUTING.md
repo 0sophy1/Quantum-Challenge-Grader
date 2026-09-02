@@ -197,7 +197,7 @@ You may find it easier to copy an existing challenge and modify it.
 
 A *lab* is a single Python file corresponding to a Jupyter notebook that users receive. Each *challenge* has one or more labs. When you add new exercises to the server, add a matching Python file here so that users can call grading functions from their Jupyter notebooks.
 
-Create `qc_grader/challenges/{my_challenge}/{lab}.py`, e.g. `qc_grader/challenges/my_challenge/lab1.py`.
+Create `qc_grader/challenges/{challenge}/{lab}.py`, e.g. `qc_grader/challenges/my_challenge/lab1.py`.
 
 The `_CHALLENGE` and `_LAB` constants, and each exercise string (e.g., `"ex1"`), must exactly match the identifiers configured on the server. These are permanent: once a challenge is live, changing them breaks existing notebook submissions. (The challenge, lab, and exercise identifiers, and the actual grading, are configured server-side by the IBM Quantum team; the client only forwards answers to them.)
 
