@@ -2,8 +2,6 @@
 Fall Fest 2026 - SLC Magnetization Partner Lab - Grading Functions
 """
 
-from typing import Any
-
 import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.circuit import BoxOp, CircuitInstruction
@@ -16,10 +14,6 @@ from qc_grader.grader.grade import grade_answer
 _CHALLENGE = "fallfest_2026"
 _LAB = "magnetization"
 _NUM_QUBITS = 20
-
-
-def _grade(answer: Any, exercise: str) -> None:
-    grade_answer(answer, lab=_LAB, exercise=exercise, challenge=_CHALLENGE)
 
 
 @typechecked
@@ -37,7 +31,7 @@ def grade_magnetization_ex1(
         "num_unique_layers": int(len(unique_2q_instructions)),
         "num_noise_models": int(len(noise_model_paulis)),
     }
-    _grade(facts, "ex1")
+    grade_answer(facts, lab=_LAB, exercise="ex1", challenge=_CHALLENGE)
 
 
 @typechecked
@@ -50,7 +44,7 @@ def grade_magnetization_ex2(gamma_per_site: list[float] | np.ndarray) -> None:
         "gamma_max": float(g.max()),
         "gamma_sq_max": float((g**2).max()),
     }
-    _grade(facts, "ex2")
+    grade_answer(facts, lab=_LAB, exercise="ex2", challenge=_CHALLENGE)
 
 
 @typechecked
@@ -80,7 +74,7 @@ def grade_magnetization_ex3(
         "num_bad_shape": int(num_bad_shape),
         "num_bad_circuit": int(num_bad_circuit),
     }
-    _grade(facts, "ex3")
+    grade_answer(facts, lab=_LAB, exercise="ex3", challenge=_CHALLENGE)
 
 
 @typechecked
@@ -101,4 +95,4 @@ def grade_magnetization_ex4(
         "slc_total_magnetization": float(m.sum()),
         "exact_total_magnetization": float(e.sum()),
     }
-    _grade(facts, "ex4")
+    grade_answer(facts, lab=_LAB, exercise="ex4", challenge=_CHALLENGE)
